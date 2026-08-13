@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Tu Profe en Casa</string>
+    <string name="title_activity_main">Tu Profe en Casa</string>
+    <string name="package_name">com.zebdon.tuprofeencasa</string>
+    <string name="custom_url_scheme">com.zebdon.tuprofeencasa</string>
+</resources>
