@@ -104,7 +104,7 @@ export default function Chat() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontWeight: 800, color: "var(--azul-principal)" }}>
-          <div className="logo-icon">📚</div>
+          <div className="logo-icon">TP</div>
           {usuario?.nombreAlumno || "Alumno/a"}
         </div>
         <button onClick={cerrarSesion} className="btn btn-outline">Salir</button>

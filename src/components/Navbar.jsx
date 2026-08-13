@@ -4,9 +4,9 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 const ENLACES = [
-  { to: "/etapa/primaria", label: "🎒 Primaria" },
-  { to: "/etapa/secundaria", label: "📐 Secundaria" },
-  { to: "/etapa/bachillerato", label: "🎓 Bachillerato" },
+  { to: "/etapa/primaria", label: "Primaria", clase: "nav-primaria" },
+  { to: "/etapa/secundaria", label: "Secundaria", clase: "nav-secundaria" },
+  { to: "/etapa/bachillerato", label: "Bachillerato", clase: "nav-bachillerato" },
 ];
 
 export default function Navbar() {
@@ -15,14 +15,14 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <NavLink to="/" className="navbar-brand" onClick={() => setAbierto(false)}>
-        <div className="logo-icon">📚</div>
+        <div className="logo-icon">TP</div>
         Tu Profe en Casa
       </NavLink>
 
       <ul className="navbar-nav">
         {ENLACES.map((e) => (
           <li key={e.to}>
-            <NavLink to={e.to} className={({ isActive }) => (isActive ? "active" : "")}>
+            <NavLink to={e.to} className={({ isActive }) => `${e.clase} ${isActive ? "active" : ""}`}>
               {e.label}
             </NavLink>
           </li>
@@ -48,7 +48,7 @@ export default function Navbar() {
       <ul className={`navbar-nav-movil ${abierto ? "abierta" : ""}`}>
         {ENLACES.map((e) => (
           <li key={e.to}>
-            <NavLink to={e.to} onClick={() => setAbierto(false)}>{e.label}</NavLink>
+            <NavLink to={e.to} className={e.clase} onClick={() => setAbierto(false)}>{e.label}</NavLink>
           </li>
         ))}
         <li><NavLink to="/auth" onClick={() => setAbierto(false)}>Iniciar sesión</NavLink></li>

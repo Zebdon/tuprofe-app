@@ -21,13 +21,16 @@ export default function Auth() {
       <Navbar />
       <div className="registro-container">
       <div className="registro-left">
+        <div className="registro-badge">⭐ 4,8/5 <span>· 12.000 familias</span></div>
         <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📚</div>
         <h2>Empieza a aprender hoy</h2>
         <p>Únete a más de 12.000 alumnos que ya mejoran sus notas con Tu Profe en Casa.</p>
-        <div className="registro-benefit"><span>✓</span> 7 días de prueba completamente gratis</div>
-        <div className="registro-benefit"><span>✓</span> Sin tarjeta de crédito</div>
-        <div className="registro-benefit"><span>✓</span> Todas las materias LOMLOE</div>
-        <div className="registro-benefit"><span>✓</span> Profe IA con método guía</div>
+        <div className="registro-benefits">
+          <div className="registro-benefit"><span>✓</span> 7 días de prueba completamente gratis</div>
+          <div className="registro-benefit"><span>✓</span> Sin tarjeta de crédito</div>
+          <div className="registro-benefit"><span>✓</span> Todas las materias LOMLOE</div>
+          <div className="registro-benefit"><span>✓</span> Profe IA con método guía</div>
+        </div>
       </div>
 
       <div className="registro-right">
@@ -54,15 +57,56 @@ export default function Auth() {
   );
 }
 
+function calcularEdadCliente(fechaISO) {
+  const hoy = new Date();
+  const nacimiento = new Date(fechaISO);
+  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const noHaCumplidoAun =
+    hoy.getMonth() < nacimiento.getMonth() ||
+    (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() < nacimiento.getDate());
+  if (noHaCumplidoAun) edad--;
+  return edad;
+}
+
+const ETAPA_OPCIONES = [
+  { value: "primaria", clase: "primaria", icono: "🖍️", label: "Primaria" },
+  { value: "eso", clase: "secundaria", icono: "📘", label: "ESO" },
+  { value: "bachillerato", clase: "bachillerato", icono: "🎓", label: "Bachillerato" },
+];
+
 function FormularioRegistro() {
   const [enviado, setEnviado] = useState(null); // null | { requiereConsentimiento }
   const [enviando, setEnviando] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [emailConError, setEmailConError] = useState(false);
+  const [avisoEdad, setAvisoEdad] = useState("");
+  const [verPassword, setVerPassword] = useState(false);
+  const [etapa, setEtapa] = useState("");
+  const [avisoEtapa, setAvisoEtapa] = useState(false);
+
+  function handleFechaBlur(e) {
+    const valor = e.target.value;
+    if (!valor) { setAvisoEdad(""); return; }
+    const edad = calcularEdadCliente(valor);
+    setAvisoEdad(
+      edad < 6 || edad > 20
+        ? "Esta fecha no parece corresponder a un alumno de 6 a 20 años. Revísala antes de continuar."
+        : ""
+    );
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setEnviando(true);
     setErrorMsg("");
+    setEmailConError(false);
+
+    if (!etapa) {
+      setAvisoEtapa(true);
+      setErrorMsg("Selecciona una etapa educativa");
+      return;
+    }
+    setAvisoEtapa(false);
+    setEnviando(true);
 
     const form = e.target;
     try {
@@ -70,12 +114,13 @@ function FormularioRegistro() {
         nombreAlumno: form.nombre.value,
         fechaNacimiento: form.fechaNacimiento.value,
         emailTutor: form.emailTutor.value,
-        etapa: form.etapa.value,
+        etapa,
         password: form.password.value,
       });
       setEnviado(datos);
     } catch (err) {
       setErrorMsg(err.message);
+      if (err.message?.includes("Ya existe")) setEmailConError(true);
     } finally {
       setEnviando(false);
     }
@@ -103,27 +148,67 @@ function FormularioRegistro() {
       </div>
       <div className="form-group">
         <label>Fecha de nacimiento del alumno</label>
-        <input name="fechaNacimiento" type="date" required />
+        <input name="fechaNacimiento" type="date" required onBlur={handleFechaBlur} />
         <p style={{ fontSize: "0.78rem", color: "var(--gris-texto)", marginTop: "0.3rem" }}>
           La usamos solo para saber si necesitamos el permiso de un adulto responsable (obligatorio por ley para menores de 14 años).
         </p>
+        {avisoEdad && (
+          <p style={{ fontSize: "0.8rem", color: "var(--naranja)", marginTop: "0.3rem", fontWeight: 600 }}>
+            {avisoEdad}
+          </p>
+        )}
       </div>
       <div className="form-group">
         <label>Correo del tutor o padre/madre</label>
-        <input name="emailTutor" type="email" placeholder="correo@ejemplo.com" required />
+        <input
+          name="emailTutor"
+          type="email"
+          placeholder="correo@ejemplo.com"
+          required
+          className={emailConError ? "input-error" : ""}
+          onChange={() => setEmailConError(false)}
+        />
+        {emailConError && (
+          <p style={{ fontSize: "0.8rem", color: "var(--naranja)", marginTop: "0.3rem", fontWeight: 600 }}>
+            Ya existe una cuenta con este correo. Prueba a iniciar sesión.
+          </p>
+        )}
       </div>
       <div className="form-group">
         <label>Etapa educativa</label>
-        <select name="etapa" required defaultValue="">
-          <option value="" disabled>Selecciona una etapa...</option>
-          <option value="primaria">Educación Primaria (1.º a 6.º)</option>
-          <option value="eso">ESO — Secundaria (1.º a 4.º)</option>
-          <option value="bachillerato">Bachillerato (1.º o 2.º)</option>
-        </select>
+        <div className={`etapa-options ${avisoEtapa ? "input-error" : ""}`}>
+          {ETAPA_OPCIONES.map((op) => (
+            <button
+              type="button"
+              key={op.value}
+              className={`etapa-option ${op.clase} ${etapa === op.value ? "active" : ""}`}
+              onClick={() => { setEtapa(op.value); setAvisoEtapa(false); }}
+            >
+              <span className="etapa-option-icon">{op.icono}</span>
+              {op.label}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="form-group">
         <label>Contraseña</label>
-        <input name="password" type="password" placeholder="Mínimo 8 caracteres" required minLength={8} />
+        <div className="password-wrap">
+          <input
+            name="password"
+            type={verPassword ? "text" : "password"}
+            placeholder="Mínimo 8 caracteres"
+            required
+            minLength={8}
+          />
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setVerPassword((v) => !v)}
+            aria-label={verPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          >
+            {verPassword ? "🙈" : "👁️"}
+          </button>
+        </div>
       </div>
 
       {errorMsg && <p style={{ color: "var(--naranja)", marginBottom: "1rem", fontWeight: 600 }}>{errorMsg}</p>}
@@ -134,7 +219,7 @@ function FormularioRegistro() {
         disabled={enviando}
         style={{ width: "100%", justifyContent: "center", fontSize: "1.05rem", padding: "0.9rem" }}
       >
-        {enviando ? "Creando cuenta..." : "🚀 Empezar prueba gratis — 7 días"}
+        {enviando ? (<><span className="spinner" />Creando cuenta...</>) : "🚀 Empezar prueba gratis — 7 días"}
       </button>
       <p style={{ fontSize: "0.82rem", color: "var(--gris-texto)", textAlign: "center", marginTop: "0.8rem" }}>
         Al registrarte aceptas nuestros{" "}
@@ -150,6 +235,7 @@ function FormularioLogin() {
   const navigate = useNavigate();
   const [enviando, setEnviando] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [verPassword, setVerPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -178,7 +264,22 @@ function FormularioLogin() {
       </div>
       <div className="form-group">
         <label>Contraseña</label>
-        <input name="password" type="password" placeholder="Tu contraseña" required />
+        <div className="password-wrap">
+          <input
+            name="password"
+            type={verPassword ? "text" : "password"}
+            placeholder="Tu contraseña"
+            required
+          />
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setVerPassword((v) => !v)}
+            aria-label={verPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          >
+            {verPassword ? "🙈" : "👁️"}
+          </button>
+        </div>
       </div>
 
       {errorMsg && <p style={{ color: "var(--naranja)", marginBottom: "1rem", fontWeight: 600 }}>{errorMsg}</p>}
@@ -189,7 +290,7 @@ function FormularioLogin() {
         disabled={enviando}
         style={{ width: "100%", justifyContent: "center", fontSize: "1.05rem", padding: "0.9rem" }}
       >
-        {enviando ? "Entrando..." : "Iniciar sesión"}
+        {enviando ? (<><span className="spinner" />Entrando...</>) : "Iniciar sesión"}
       </button>
     </form>
   );

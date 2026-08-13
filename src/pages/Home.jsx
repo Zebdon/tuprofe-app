@@ -1,7 +1,64 @@
 // src/pages/Home.jsx
+import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Seo from "../components/Seo";
+
+function useEnPantalla() {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return [ref, visible];
+}
+
+function ContadorAnimado({ num, suffix = "", duracion = 1200 }) {
+  const [ref, visible] = useEnPantalla();
+  const [valor, setValor] = useState(0);
+
+  useEffect(() => {
+    if (!visible) return;
+    const inicio = performance.now();
+    let frame;
+    function tick(ahora) {
+      const progreso = Math.min((ahora - inicio) / duracion, 1);
+      const facilitado = 1 - Math.pow(1 - progreso, 3);
+      setValor(Math.round(num * facilitado));
+      if (progreso < 1) frame = requestAnimationFrame(tick);
+    }
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [visible, num, duracion]);
+
+  return (
+    <span ref={ref}>
+      {valor.toLocaleString("es-ES")}
+      {suffix}
+    </span>
+  );
+}
+
+const STATS = [
+  { num: 12000, suffix: "+", label: "Alumnos", clase: "azul" },
+  { num: 3, suffix: "", label: "Etapas educativas", clase: "verde" },
+  { num: 100, suffix: "%", label: "Currículo oficial", clase: "lila" },
+  { texto: "24/7", label: "Disponibilidad", clase: "amarillo" },
+];
 
 const CARACTERISTICAS = [
   {
@@ -27,8 +84,8 @@ const CARACTERISTICAS = [
 ];
 
 const ETAPAS = [
-  { to: "/etapa/primaria", titulo: "Primaria", texto: "1.º a 6.º curso", img: "/images/nino_estudiando.jpg" },
-  { to: "/etapa/secundaria", titulo: "ESO", texto: "1.º a 4.º curso", img: "/images/profe_clase.jpg" },
+  { to: "/etapa/primaria", titulo: "Primaria", texto: "1.º a 6.º curso", img: "/images/ninos_primaria.jpg" },
+  { to: "/etapa/secundaria", titulo: "ESO", texto: "1.º a 4.º curso", img: "/images/profe_eso.jpg" },
   { to: "/etapa/bachillerato", titulo: "Bachillerato", texto: "1.º y 2.º curso, EBAU", img: "/images/profe_alumno.jpg" },
 ];
 
@@ -48,9 +105,9 @@ export default function Home() {
       />
       <Navbar />
 
-      <section className="hero">
+      <section className="hero hero-foto">
         <div className="hero-content">
-          <span className="hero-badge">✨ Currículo oficial LOMLOE de Asturias</span>
+          <span className="hero-badge">Currículo oficial LOMLOE de Asturias</span>
           <h1>
             Una profe que <span>guía</span>, no una IA que solo <span>responde</span>
           </h1>
@@ -66,17 +123,21 @@ export default function Home() {
       </section>
 
       <div className="stats-bar">
-        <div className="stat-item"><div className="stat-num">12.000+</div><div className="stat-label">Alumnos</div></div>
-        <div className="stat-item"><div className="stat-num">3</div><div className="stat-label">Etapas educativas</div></div>
-        <div className="stat-item"><div className="stat-num">100%</div><div className="stat-label">Currículo oficial</div></div>
-        <div className="stat-item"><div className="stat-num">24/7</div><div className="stat-label">Disponibilidad</div></div>
+        {STATS.map((s) => (
+          <div className={`stat-item ${s.clase}`} key={s.label}>
+            <div className="stat-num">
+              {s.num !== undefined ? <ContadorAnimado num={s.num} suffix={s.suffix} /> : s.texto}
+            </div>
+            <div className="stat-label">{s.label}</div>
+          </div>
+        ))}
       </div>
 
       {/* VISTA PREVIA DE LA APP — deja claro que esto es una app real, no solo una web informativa */}
       <section className="seccion-clara" style={{ padding: "4.5rem 2rem" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "center", maxWidth: 1100, margin: "0 auto" }} className="etapa-grid">
           <div>
-            <span className="hero-badge">💬 Así es la app por dentro</span>
+            <span className="hero-badge">Así es la app por dentro</span>
             <h2 style={{ fontSize: "2rem", fontWeight: 900, margin: "1rem 0" }}>
               Habla con la Profe como si estuviera a tu lado
             </h2>
@@ -171,7 +232,7 @@ export default function Home() {
 
       <footer style={{ background: "var(--texto-oscuro)", color: "white", padding: "3rem 2rem 1.5rem", textAlign: "center" }}>
         <div className="footer-brand" style={{ justifyContent: "center", marginBottom: "1rem" }}>
-          <div className="logo-icon">📚</div>
+          <div className="logo-icon">TP</div>
           <strong>Tu Profe en Casa</strong>
         </div>
         <p style={{ opacity: 0.7, fontSize: "0.9rem" }}>

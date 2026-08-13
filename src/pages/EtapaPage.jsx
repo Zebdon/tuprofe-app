@@ -13,17 +13,17 @@ const DATOS_ETAPA = {
     titulo: "Educación Primaria",
     cursos: "1.º a 6.º de Primaria",
     descripcion: "Acompañamos los primeros pasos del aprendizaje con pistas visuales y manipulativas, adaptadas a cómo aprenden los niños y niñas de esta edad.",
-    img: "/images/nino_estudiando.jpg",
+    img: "/images/ninos_primaria.jpg",
     materias: ["Matemáticas", "Lengua Castellana"],
-    color: "var(--verde)",
+    color: "#34a853",
   },
   secundaria: {
     titulo: "ESO — Secundaria",
     cursos: "1.º a 4.º de la ESO",
     descripcion: "Todas las materias troncales de la ESO, con un tono cercano y directo, ideal para reforzar deberes y preparar exámenes.",
-    img: "/images/profe_clase.jpg",
+    img: "/images/profe_eso.jpg",
     materias: ["Matemáticas", "Lengua", "Física y Química", "Biología y Geología", "Geografía e Historia", "Inglés"],
-    color: "var(--azul-principal)",
+    color: "#1a73e8",
   },
   bachillerato: {
     titulo: "Bachillerato",
@@ -31,7 +31,7 @@ const DATOS_ETAPA = {
     descripcion: "Preparación de nivel EBAU/Selectividad en las materias clave, con el rigor académico que necesita esta etapa.",
     img: "/images/profe_alumno.jpg",
     materias: ["Matemáticas I y II", "Física", "Química", "Historia de España", "Filosofía", "Biología", "Lengua y Literatura", "Economía"],
-    color: "var(--lila)",
+    color: "#7c4dff",
   },
 };
 
