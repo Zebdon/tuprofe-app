@@ -37,4 +37,5 @@ export const api = {
   registro: (body) => peticion("/api/registro", { method: "POST", body: JSON.stringify(body) }),
   login: (body) => peticion("/api/login", { method: "POST", body: JSON.stringify(body) }),
   tutor: (body) => peticion("/api/tutor", { method: "POST", body: JSON.stringify(body) }),
+  progreso: (body) => peticion("/api/progreso", { method: "POST", body: JSON.stringify(body) }),
 };

@@ -6,6 +6,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
+import AsidePanel from "../components/AsidePanel";
 
 const MATERIAS_POR_ETAPA = {
   primaria: [{ valor: "matematicas", etiqueta: "Matemáticas" }, { valor: "lengua", etiqueta: "Lengua" }],
@@ -92,7 +93,8 @@ export default function Chat() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--fondo)" }}>
+    <div className="app-layout">
+    <div className="app-main" style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--fondo)" }}>
       <header
         style={{
           display: "flex",
@@ -104,7 +106,7 @@ export default function Chat() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontWeight: 800, color: "var(--azul-principal)" }}>
-          <div className="logo-icon">TP</div>
+          <div className="logo-icon">📚</div>
           {usuario?.nombreAlumno || "Alumno/a"}
         </div>
         <button onClick={cerrarSesion} className="btn btn-outline">Salir</button>
@@ -157,6 +159,8 @@ export default function Chat() {
         />
         <button type="submit" className="btn btn-primary" disabled={enviando}>Enviar</button>
       </form>
+    </div>
+    <AsidePanel />
     </div>
   );
 }

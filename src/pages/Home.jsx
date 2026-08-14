@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Seo from "../components/Seo";
+import BlogPreviewSection from "../components/BlogPreviewSection";
+import MasQueEstudiarSection from "../components/MasQueEstudiarSection";
 
 function useEnPantalla() {
   const ref = useRef(null);
@@ -219,6 +221,9 @@ export default function Home() {
         </div>
       </section>
 
+<BlogPreviewSection />
+      <MasQueEstudiarSection />
+      
       {/* LLAMADA FINAL */}
       <section className="hero" style={{ padding: "4rem 2rem" }}>
         <div className="hero-content">

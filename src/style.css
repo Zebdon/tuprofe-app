@@ -1332,3 +1332,163 @@ footer ul li a:hover {
   .hero-buttons { flex-direction: column; align-items: center; }
   .footer-grid { grid-template-columns: 1fr; }
 }
+.hamburguesa.abierta span:nth-child(2) { opacity: 0; }
+.hamburguesa.abierta span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+.navbar-nav-movil {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: var(--blanco);
+  box-shadow: var(--sombra);
+  flex-direction: column;
+  padding: 1rem;
+  gap: 0.5rem;
+  z-index: 999;
+  list-style: none;
+}
+.navbar-nav-movil.abierta { display: flex; }
+.navbar-nav-movil a {
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radio-sm);
+  font-weight: 700;
+  color: var(--texto-oscuro);
+}
+.navbar-nav-movil a:hover { background: var(--gris-claro); }
+
+@media (max-width: 768px) {
+  .navbar-nav { display: none; }
+  .navbar-actions { display: none; }
+  .hamburguesa { display: flex; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .stats-bar { gap: 1.5rem; }
+  .precio-card.destacado { transform: scale(1); }
+  .etapa-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  .hero-buttons { flex-direction: column; align-items: center; }
+  .footer-grid { grid-template-columns: 1fr; }
+}
+
+/* ---- PANEL LATERAL (aside) — Blog, juegos, progreso, más allá de estudiar ---- */
+.app-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  min-height: 100vh;
+}
+.app-main { min-width: 0; }
+
+.aside-panel {
+  background: var(--blanco);
+  border-left: 1px solid #eee;
+  padding: 1.2rem;
+  overflow-y: auto;
+}
+.aside-titulo {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gris-texto);
+  margin: 1.4rem 0 0.6rem;
+}
+.aside-titulo:first-child { margin-top: 0; }
+
+.aside-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radio-sm);
+  text-decoration: none;
+  color: var(--texto-oscuro);
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: var(--transicion);
+  margin-bottom: 0.3rem;
+}
+.aside-link:hover { background: var(--gris-claro); }
+.aside-link .emoji { font-size: 1.15rem; }
+
+.aside-cta {
+  background: linear-gradient(135deg, var(--azul-principal), var(--lila));
+  color: white;
+  border-radius: var(--radio);
+  padding: 1rem;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+.aside-cta p { font-size: 0.85rem; margin-bottom: 0.6rem; opacity: 0.95; }
+
+.aside-toggle-movil {
+  display: none;
+  position: fixed;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  z-index: 1000;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--azul-principal);
+  color: white;
+  border: none;
+  font-size: 1.4rem;
+  box-shadow: var(--sombra);
+  cursor: pointer;
+}
+
+@media (max-width: 1000px) {
+  .app-layout { grid-template-columns: 1fr; }
+  .aside-panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 280px;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    z-index: 999;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+  }
+  .aside-panel.abierto { transform: translateX(0); }
+  .aside-toggle-movil { display: flex; align-items: center; justify-content: center; }
+}
+
+/* ---- BLOG ---- */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+.blog-categoria-badge {
+  display: inline-block;
+  background: var(--gris-claro);
+  color: var(--azul-principal);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.25rem 0.7rem;
+  border-radius: 50px;
+  margin-bottom: 0.7rem;
+}
+.blog-articulo { max-width: 720px; margin: 0 auto; line-height: 1.75; }
+.blog-articulo h2 { font-size: 1.3rem; font-weight: 800; margin: 1.8rem 0 0.6rem; }
+.blog-articulo p { margin-bottom: 1rem; color: var(--texto-oscuro); }
+
+/* ---- PROGRESO (vista para padres) ---- */
+.progreso-stat-card {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  padding: 1.3rem;
+  box-shadow: var(--sombra);
+  text-align: center;
+}
+.progreso-stat-num { font-size: 2rem; font-weight: 900; color: var(--azul-principal); }
+.progreso-tabla { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.progreso-tabla th, .progreso-tabla td {
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+.progreso-tabla th { color: var(--gris-texto); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; }

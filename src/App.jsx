@@ -9,6 +9,9 @@ import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import ConsentimientoPendiente from "./pages/ConsentimientoPendiente";
 import Legal from "./pages/Legal";
+import Blog from "./pages/Blog";
+import BlogArticulo from "./pages/BlogArticulo";
+import Progreso from "./pages/Progreso";
 import "./style.css";
 
 export default function App() {
@@ -20,6 +23,9 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/etapa/:slug" element={<EtapaPage />} />
             <Route path="/legal/:tipo" element={<Legal />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogArticulo />} />
+            <Route path="/progreso" element={<Progreso />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/consentimiento-pendiente" element={<ConsentimientoPendiente />} />
             <Route
