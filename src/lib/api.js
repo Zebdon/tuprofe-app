@@ -38,4 +38,6 @@ export const api = {
   login: (body) => peticion("/api/login", { method: "POST", body: JSON.stringify(body) }),
   tutor: (body) => peticion("/api/tutor", { method: "POST", body: JSON.stringify(body) }),
   progreso: (body) => peticion("/api/progreso", { method: "POST", body: JSON.stringify(body) }),
+  solicitarReset: (body) => peticion("/api/solicitar-reset", { method: "POST", body: JSON.stringify(body) }),
+  restablecerPassword: (body) => peticion("/api/restablecer-password", { method: "POST", body: JSON.stringify(body) }),
 };

@@ -14,6 +14,8 @@ import Legal from "./pages/Legal";
 import Blog from "./pages/Blog";
 import BlogArticulo from "./pages/BlogArticulo";
 import Progreso from "./pages/Progreso";
+import RecuperarPassword from "./pages/RecuperarPassword";
+import RestablecerPassword from "./pages/RestablecerPassword";
 import "./style.css";
 
 export default function App() {
@@ -29,6 +31,8 @@ export default function App() {
             <Route path="/blog/:slug" element={<BlogArticulo />} />
             <Route path="/progreso" element={<Progreso />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/recuperar-password" element={<RecuperarPassword />} />
+            <Route path="/restablecer-password" element={<RestablecerPassword />} />
             <Route path="/consentimiento-pendiente" element={<ConsentimientoPendiente />} />
             <Route path="/consentimiento-ok" element={<ConsentimientoOk />} />
             <Route path="/consentimiento-error" element={<ConsentimientoError />} />
