@@ -1,28 +1,50 @@
 // src/components/Navbar.jsx
 // Navbar responsive con menú hamburguesa para móvil.
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 
 const ENLACES = [
-  { to: "/etapa/primaria", label: "Primaria", clase: "nav-primaria" },
-  { to: "/etapa/secundaria", label: "Secundaria", clase: "nav-secundaria" },
-  { to: "/etapa/bachillerato", label: "Bachillerato", clase: "nav-bachillerato" },
+  { to: "/etapa/primaria", label: "🎒 Primaria" },
+  { to: "/etapa/secundaria", label: "📐 Secundaria" },
+  { to: "/etapa/bachillerato", label: "🎓 Bachillerato" },
 ];
 
 export default function Navbar() {
   const [abierto, setAbierto] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const noEsPortada = location.pathname !== "/";
 
   return (
     <nav className="navbar">
+      {/* Botón "atrás" real: usa el historial de React Router, no depende
+          del botón del navegador. Solo aparece fuera de la portada. */}
+      {noEsPortada && (
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="Volver atrás"
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "1.3rem",
+            cursor: "pointer",
+            marginRight: "0.5rem",
+            color: "var(--texto-oscuro)",
+          }}
+        >
+          ←
+        </button>
+      )}
+
       <NavLink to="/" className="navbar-brand" onClick={() => setAbierto(false)}>
-        <div className="logo-icon">TP</div>
+        <div className="logo-icon">📚</div>
         Tu Profe en Casa
       </NavLink>
 
       <ul className="navbar-nav">
         {ENLACES.map((e) => (
           <li key={e.to}>
-            <NavLink to={e.to} className={({ isActive }) => `${e.clase} ${isActive ? "active" : ""}`}>
+            <NavLink to={e.to} className={({ isActive }) => (isActive ? "active" : "")}>
               {e.label}
             </NavLink>
           </li>
@@ -48,7 +70,7 @@ export default function Navbar() {
       <ul className={`navbar-nav-movil ${abierto ? "abierta" : ""}`}>
         {ENLACES.map((e) => (
           <li key={e.to}>
-            <NavLink to={e.to} className={e.clase} onClick={() => setAbierto(false)}>{e.label}</NavLink>
+            <NavLink to={e.to} onClick={() => setAbierto(false)}>{e.label}</NavLink>
           </li>
         ))}
         <li><NavLink to="/auth" onClick={() => setAbierto(false)}>Iniciar sesión</NavLink></li>
