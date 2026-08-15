@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const { token } = req.query;
 
   if (!token) {
-    return res.redirect(302, `${process.env.SITE_URL}/pages/consentimiento-error.html?motivo=falta_token`);
+    return res.redirect(302, `${process.env.SITE_URL}/consentimiento-error?motivo=falta_token`);
   }
 
   try {
@@ -21,16 +21,16 @@ export default async function handler(req, res) {
       .single();
 
     if (errorBusqueda || !usuario) {
-      return res.redirect(302, `${process.env.SITE_URL}/pages/consentimiento-error.html?motivo=token_invalido`);
+      return res.redirect(302, `${process.env.SITE_URL}/consentimiento-error?motivo=token_invalido`);
     }
 
     if (usuario.estado_consentimiento === "confirmado") {
       // Ya estaba confirmado (el tutor pulsó el enlace dos veces): no es un error
-      return res.redirect(302, `${process.env.SITE_URL}/pages/consentimiento-ok.html?ya_estaba=true`);
+      return res.redirect(302, `${process.env.SITE_URL}/consentimiento-ok?ya_estaba=true`);
     }
 
     if (new Date(usuario.token_expira_en) < new Date()) {
-      return res.redirect(302, `${process.env.SITE_URL}/pages/consentimiento-error.html?motivo=token_caducado`);
+      return res.redirect(302, `${process.env.SITE_URL}/consentimiento-error?motivo=token_caducado`);
     }
 
     const { error: errorUpdate } = await supabase
@@ -43,12 +43,12 @@ export default async function handler(req, res) {
 
     if (errorUpdate) {
       console.error("Error al confirmar consentimiento:", errorUpdate);
-      return res.redirect(302, `${process.env.SITE_URL}/pages/consentimiento-error.html?motivo=error_servidor`);
+      return res.redirect(302, `${process.env.SITE_URL}/consentimiento-error?motivo=error_servidor`);
     }
 
-    return res.redirect(302, `${process.env.SITE_URL}/pages/consentimiento-ok.html`);
+    return res.redirect(302, `${process.env.SITE_URL}/consentimiento-ok`);
   } catch (err) {
     console.error("Error en /api/confirmar-consentimiento:", err);
-    return res.redirect(302, `${process.env.SITE_URL}/pages/consentimiento-error.html?motivo=error_servidor`);
+    return res.redirect(302, `${process.env.SITE_URL}/consentimiento-error?motivo=error_servidor`);
   }
 }

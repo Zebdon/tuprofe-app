@@ -8,6 +8,8 @@ import EtapaPage from "./pages/EtapaPage";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import ConsentimientoPendiente from "./pages/ConsentimientoPendiente";
+import ConsentimientoOk from "./pages/ConsentimientoOk";
+import ConsentimientoError from "./pages/ConsentimientoError";
 import Legal from "./pages/Legal";
 import Blog from "./pages/Blog";
 import BlogArticulo from "./pages/BlogArticulo";
@@ -28,6 +30,8 @@ export default function App() {
             <Route path="/progreso" element={<Progreso />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/consentimiento-pendiente" element={<ConsentimientoPendiente />} />
+            <Route path="/consentimiento-ok" element={<ConsentimientoOk />} />
+            <Route path="/consentimiento-error" element={<ConsentimientoError />} />
             <Route
               path="/app"
               element={
