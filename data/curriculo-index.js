@@ -117,3 +117,68 @@ function contextoBachillerato({ curso, materia }) {
     saberes_basicos: saberes,
   };
 }
+
+/**
+ * NUEVO: devuelve la lista de temas "clicables" de una materia/curso, para
+ * pintar el mapa de temario navegable (como las lecciones de Khan Academy).
+ * Cada elemento es { id, nombre, bloque? } — "bloque" agrupa visualmente
+ * (ej. "Sentido numérico") cuando aplica; en Primaria no hay bloques, cada
+ * tema ya es una unidad completa por sí sola.
+ *
+ * @returns {Array<{id: string, nombre: string, bloque?: string}>}
+ */
+export function listarTemario({ etapa, curso, materia }) {
+  if (etapa === "primaria") return listarTemasPrimaria({ curso, materia });
+  if (etapa === "eso") return listarTemasESO({ curso, materia });
+  if (etapa === "bachillerato") return listarTemasBachillerato({ curso, materia });
+  return [];
+}
+
+function listarTemasPrimaria({ curso, materia }) {
+  const temas = curriculoPrimaria.primaria?.cursos?.[curso]?.materias?.[materia]?.temas || [];
+  return temas.map((t) => ({ id: t.id, nombre: t.nombre }));
+}
+
+function listarTemasESO({ curso, materia }) {
+  const datosMateria = curriculoESO[materia];
+  if (!datosMateria) return [];
+  const items = [];
+  Object.entries(datosMateria.saberes_basicos || {}).forEach(([bloque, contenido]) => {
+    const saberes = contenido.por_curso?.[curso] || [];
+    saberes.forEach((saber, i) => {
+      items.push({ id: `${bloque}-${i}`, nombre: saber, bloque: formatearNombreBloque(bloque) });
+    });
+  });
+  return items;
+}
+
+function listarTemasBachillerato({ curso, materia }) {
+  const datosMateria = curriculoBachillerato[materia];
+  if (!datosMateria) return [];
+  const items = [];
+
+  if (materia === "matematicas") {
+    const clave = curso; // "matematicas_I" | "matematicas_II"
+    const saberes = datosMateria.saberes_basicos?.[clave] || {};
+    Object.entries(saberes).forEach(([bloque, lista]) => {
+      (lista || []).forEach((saber, i) => {
+        items.push({ id: `${clave}-${bloque}-${i}`, nombre: saber, bloque: formatearNombreBloque(bloque) });
+      });
+    });
+    return items;
+  }
+
+  Object.entries(datosMateria.saberes_basicos || {}).forEach(([bloque, lista]) => {
+    const arr = Array.isArray(lista) ? lista : [];
+    arr.forEach((saber, i) => {
+      items.push({ id: `${bloque}-${i}`, nombre: saber, bloque: formatearNombreBloque(bloque) });
+    });
+  });
+  return items;
+}
+
+// "bloque_A_lenguas_hablantes" -> "Lenguas hablantes" · "sentido_numerico" -> "Sentido numerico"
+function formatearNombreBloque(claveBloque) {
+  const limpio = claveBloque.replace(/^bloque_[A-Za-z]_/, "").replace(/_/g, " ");
+  return limpio.charAt(0).toUpperCase() + limpio.slice(1);
+}

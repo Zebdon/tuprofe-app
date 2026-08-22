@@ -40,4 +40,5 @@ export const api = {
   progreso: (body) => peticion("/api/progreso", { method: "POST", body: JSON.stringify(body) }),
   solicitarReset: (body) => peticion("/api/solicitar-reset", { method: "POST", body: JSON.stringify(body) }),
   restablecerPassword: (body) => peticion("/api/restablecer-password", { method: "POST", body: JSON.stringify(body) }),
+  temario: (body) => peticion("/api/temario", { method: "POST", body: JSON.stringify(body) }),
 };

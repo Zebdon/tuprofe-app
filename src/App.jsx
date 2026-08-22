@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import RutaProtegida from "./components/RutaProtegida";
 import Home from "./pages/Home";
 import EtapaPage from "./pages/EtapaPage";
+import Temario from "./pages/Temario";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import ConsentimientoPendiente from "./pages/ConsentimientoPendiente";
@@ -26,6 +27,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/etapa/:slug" element={<EtapaPage />} />
+            <Route path="/temario" element={<Temario />} />
             <Route path="/legal/:tipo" element={<Legal />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogArticulo />} />

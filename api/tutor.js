@@ -1,6 +1,7 @@
 // api/tutor.js
 // Proxy serverless para "Tu Profe en Casa" — Vercel Function
 // Implementa el método de tutoría guiada (socrático), NUNCA da la respuesta directa.
+// Soporta imágenes (foto de la libreta/ejercicio) y responde fórmulas en LaTeX.
 
 import { createClient } from "@supabase/supabase-js";
 import { obtenerContextoCurricular } from "../data/curriculo-index.js";
@@ -21,13 +22,14 @@ export default async function handler(req, res) {
       curso,          // Primaria: "1".."6" · ESO: "1".."4" · Bachillerato: "1"/"2" (o "matematicas_I"/"matematicas_II")
       materia,        // clave tal como en los archivos de currículo, ej. "matematicas", "lengua_castellana"
       temaId,         // solo necesario en Primaria (organizada por temas discretos)
+      imagen,         // opcional: { data: base64SinPrefijo, mediaType: "image/jpeg" } — foto de la libreta
     } = req.body;
 
     if (!usuarioId) {
       return res.status(401).json({ error: "Falta identificar al usuario" });
     }
-    if (!mensaje) {
-      return res.status(400).json({ error: "Falta el campo 'mensaje'" });
+    if (!mensaje && !imagen) {
+      return res.status(400).json({ error: "Falta el mensaje o una imagen" });
     }
 
     // CANDADO DE CONSENTIMIENTO PARENTAL — no se llama a la IA si la cuenta
@@ -56,11 +58,26 @@ export default async function handler(req, res) {
       });
     }
 
+    // Límite de tamaño razonable para la imagen (evita facturas de API disparadas
+    // por fotos enormes sin comprimir — el frontend ya comprime, esto es un cinturón extra)
+    if (imagen?.data && imagen.data.length > 7_000_000) {
+      return res.status(413).json({ error: "La imagen es demasiado grande. Prueba a hacer la foto de nuevo." });
+    }
+
     // Busca el contenido curricular real (saberes + criterios oficiales) para
     // anclar la respuesta de la IA al currículo, en vez de a su conocimiento genérico.
     const contextoCurricular = obtenerContextoCurricular({ etapa, curso, materia, temaId });
 
     const systemPrompt = construirSystemPrompt({ etapa, curso, materia, contextoCurricular });
+
+    // Construye el contenido del último mensaje del alumno: texto solo,
+    // o texto + imagen si adjuntó una foto de su libreta/ejercicio.
+    const contenidoUsuario = imagen
+      ? [
+          { type: "image", source: { type: "base64", media_type: imagen.mediaType, data: imagen.data } },
+          { type: "text", text: mensaje || "Aquí tienes una foto de mi libreta. ¿Me ayudas con esto?" },
+        ]
+      : mensaje;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -71,11 +88,11 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-5",
-        max_tokens: 500,
+        max_tokens: 700,
         system: systemPrompt,
         messages: [
           ...historial,
-          { role: "user", content: mensaje },
+          { role: "user", content: contenidoUsuario },
         ],
       }),
     });
@@ -94,13 +111,15 @@ export default async function handler(req, res) {
 
     // Guardamos la conversación para dar continuidad pedagógica y para poder
     // exportar/borrar el historial si el tutor o el alumno ejercen sus
-    // derechos RGPD. Si falla el guardado, no bloqueamos la respuesta al alumno.
+    // derechos RGPD. No guardamos la imagen en sí (solo un aviso de que hubo
+    // una), para no acumular datos innecesarios. Si falla el guardado, no
+    // bloqueamos la respuesta al alumno.
     const { error: errorGuardado } = await supabase.from("conversaciones").insert({
       usuario_id: usuarioId,
       etapa,
       curso,
       materia,
-      mensaje_alumno: mensaje,
+      mensaje_alumno: imagen ? `${mensaje || ""} [con foto adjunta]`.trim() : mensaje,
       respuesta_profe: textoRespuesta,
     });
     if (errorGuardado) {
@@ -156,6 +175,30 @@ pero sé prudente: menciona que conviene contrastar con el libro de texto o el p
 del centro para cualquier detalle muy específico del temario oficial.`;
   }
 
+  const materiasConFormulas = ["matematicas", "fisica", "quimica", "fisica_quimica"];
+  const bloqueFormato = materiasConFormulas.includes(materia)
+    ? `
+FORMATO DE FÓRMULAS MATEMÁTICAS (MUY IMPORTANTE):
+Esta materia usa notación matemática/científica. Escribe SIEMPRE las fórmulas, ecuaciones,
+fracciones, exponentes, raíces y símbolos en formato LaTeX, para que se rendericen bien:
+- Fórmulas dentro de una frase: entre signos de dólar simples. Ejemplo: "el área es $A = \\pi r^2$".
+- Fórmulas destacadas en su propia línea: entre dobles signos de dólar. Ejemplo:
+  $$\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$
+- Usa \\frac{}{} para fracciones, ^{} para exponentes, \\sqrt{} para raíces, \\times y \\cdot para
+  multiplicación, letras griegas con su nombre (\\pi, \\theta, \\Delta...).
+- El texto normal de la explicación NO va en LaTeX, solo las fórmulas en sí.
+`
+    : "";
+
+  const bloqueImagen = `
+SI EL ALUMNO ADJUNTA UNA FOTO (de su libreta, un ejercicio o un libro):
+- Lee con cuidado lo que hay escrito a mano o impreso, incluyendo símbolos y números.
+- Si la letra o la foto no se entiende bien en alguna parte, dilo con amabilidad y pide que
+  lo escriba también en el chat, en vez de adivinar y arriesgarte a equivocarte.
+- Aplica exactamente el mismo método guía de siempre sobre lo que veas en la imagen — la foto
+  es solo una forma más cómoda de mostrarte el ejercicio, no cambia cómo debes enseñar.
+`;
+
   return `Eres "Profe", una tutora virtual paciente, cálida y motivadora de la plataforma "Tu Profe en Casa".
 
 CONTEXTO DEL ALUMNO:
@@ -163,6 +206,8 @@ CONTEXTO DEL ALUMNO:
 - Curso: ${curso || "no especificado"}
 - Materia: ${materia || "no especificada"}
 ${bloqueCurricular}
+${bloqueFormato}
+${bloqueImagen}
 
 REGLA PREVIA — DECIDE QUÉ TIPO DE CONOCIMIENTO ES ANTES DE RESPONDER:
 No todo se aprende igual, y un buen profesor no usa el mismo método para todo. Antes de aplicar
