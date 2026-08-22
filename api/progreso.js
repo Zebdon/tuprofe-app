@@ -2,6 +2,10 @@
 // Vercel Function: devuelve un resumen de la actividad del alumno para que
 // el padre/madre/tutor pueda ver en qué ha estado trabajando, sin exponer
 // el contenido literal de las conversaciones (solo agregados).
+//
+// Incluye desglose por TEMA dentro de cada materia (no solo conteo por
+// materia), para poder mostrar un panel tipo "Multiplicación: practicado ✓
+// · Fracciones: en progreso" en vez de solo "Matemáticas: 12 preguntas".
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -24,6 +28,10 @@ const ETIQUETAS_MATERIA = {
   economia: "Economía",
 };
 
+// A partir de cuántas preguntas sobre el mismo tema consideramos que el
+// alumno lo ha "practicado" de verdad, en vez de haberlo solo rozado.
+const UMBRAL_PRACTICADO = 3;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
@@ -37,7 +45,7 @@ export default async function handler(req, res) {
 
     const { data: conversaciones, error } = await supabase
       .from("conversaciones")
-      .select("materia, created_at")
+      .select("materia, tema, created_at")
       .eq("usuario_id", usuarioId)
       .order("created_at", { ascending: false });
 
@@ -48,16 +56,45 @@ export default async function handler(req, res) {
 
     const porMateriaMapa = {};
     for (const c of conversaciones) {
-      const clave = c.materia || "otra";
-      if (!porMateriaMapa[clave]) {
-        porMateriaMapa[clave] = { materia: ETIQUETAS_MATERIA[clave] || clave, conteo: 0, ultimaVez: c.created_at };
+      const claveMateria = c.materia || "otra";
+      if (!porMateriaMapa[claveMateria]) {
+        porMateriaMapa[claveMateria] = {
+          materia: ETIQUETAS_MATERIA[claveMateria] || claveMateria,
+          conteo: 0,
+          ultimaVez: c.created_at,
+          temasMapa: {},
+        };
       }
-      porMateriaMapa[clave].conteo += 1;
+      const entradaMateria = porMateriaMapa[claveMateria];
+      entradaMateria.conteo += 1;
+
+      // Solo se contabilizan como "tema" las conversaciones que llegaron con
+      // un tema concreto elegido (desde el mapa de temario). Las preguntas
+      // sueltas sin tema elegido siguen contando en el total de la materia,
+      // pero no aparecen en el desglose por tema.
+      if (c.tema) {
+        if (!entradaMateria.temasMapa[c.tema]) {
+          entradaMateria.temasMapa[c.tema] = { tema: c.tema, conteo: 0, ultimaVez: c.created_at };
+        }
+        entradaMateria.temasMapa[c.tema].conteo += 1;
+      }
     }
 
     const porMateria = Object.values(porMateriaMapa)
       .sort((a, b) => b.conteo - a.conteo)
-      .map((m) => ({ ...m, ultimaVez: formatearFecha(m.ultimaVez) }));
+      .map((m) => ({
+        materia: m.materia,
+        conteo: m.conteo,
+        ultimaVez: formatearFecha(m.ultimaVez),
+        temas: Object.values(m.temasMapa)
+          .sort((a, b) => b.conteo - a.conteo)
+          .map((t) => ({
+            tema: t.tema,
+            conteo: t.conteo,
+            ultimaVez: formatearFecha(t.ultimaVez),
+            estado: t.conteo >= UMBRAL_PRACTICADO ? "practicado" : "en_progreso",
+          })),
+      }));
 
     return res.status(200).json({
       totalSesiones: conversaciones.length,

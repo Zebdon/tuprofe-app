@@ -59,6 +59,9 @@ export default function Chat() {
 
   const [materia, setMateria] = useState(materiaInicial);
   const [curso, setCurso] = useState(cursoInicial);
+  // Se mantiene durante toda la conversación (no solo en el primer mensaje)
+  // para que /api/progreso pueda medir progreso por tema, no solo por materia.
+  const [temaActivo, setTemaActivo] = useState(temaInicial || null);
   const [mensajes, setMensajes] = useState([
     { role: "assistant", content: "¡Hola! 👋 Soy tu Profe. Cuéntame, ¿en qué tema quieres que te ayude hoy?" },
   ]);
@@ -143,6 +146,7 @@ export default function Chat() {
         etapa,
         curso,
         materia,
+        tema: temaActivo || undefined,
         imagen: imagenParaEnviar,
       });
       setMensajes((prev) => [...prev, { role: "assistant", content: datos.respuesta }]);
@@ -200,12 +204,43 @@ export default function Chat() {
             <option key={c} value={c}>{c}.º</option>
           ))}
         </select>
-        <select value={materia} onChange={(e) => setMateria(e.target.value)} style={selectStyle}>
+        <select
+          value={materia}
+          onChange={(e) => {
+            setMateria(e.target.value);
+            setTemaActivo(null); // el tema de antes ya no aplica a la nueva materia
+          }}
+          style={selectStyle}
+        >
           {MATERIAS_POR_ETAPA[etapa].map((m) => (
             <option key={m.valor} value={m.valor}>{m.etiqueta}</option>
           ))}
         </select>
       </div>
+
+      {temaActivo && (
+        <div style={{ padding: "0 1.2rem 0.6rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span
+            style={{
+              background: "rgba(26,115,232,0.1)",
+              color: "var(--azul-principal)",
+              padding: "0.35rem 0.8rem",
+              borderRadius: "50px",
+              fontSize: "0.85rem",
+              fontWeight: 700,
+            }}
+          >
+            📘 {temaActivo}
+          </span>
+          <button
+            type="button"
+            onClick={() => setTemaActivo(null)}
+            style={{ background: "none", border: "none", color: "var(--gris-texto)", fontSize: "0.8rem", cursor: "pointer", textDecoration: "underline" }}
+          >
+            quitar tema
+          </button>
+        </div>
+      )}
 
       {avisoBloqueo && (
         <div style={{ background: "#fff3e0", color: "#e65100", padding: "0.9rem 1.2rem", fontWeight: 600 }}>

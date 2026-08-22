@@ -1476,19 +1476,93 @@ footer ul li a:hover {
 .blog-articulo p { margin-bottom: 1rem; color: var(--texto-oscuro); }
 
 /* ---- PROGRESO (vista para padres) ---- */
+.progreso-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
 .progreso-stat-card {
   background: var(--blanco);
   border-radius: var(--radio);
-  padding: 1.3rem;
+  padding: 1.4rem 1rem;
   box-shadow: var(--sombra);
   text-align: center;
 }
-.progreso-stat-num { font-size: 2rem; font-weight: 900; color: var(--azul-principal); }
-.progreso-tabla { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-.progreso-tabla th, .progreso-tabla td {
-  text-align: left;
-  padding: 0.7rem 0.9rem;
-  border-bottom: 1px solid #eee;
-  font-size: 0.9rem;
+.progreso-stat-num { font-size: 2rem; font-weight: 900; color: var(--azul-principal); line-height: 1.1; }
+.progreso-stat-label { font-size: 0.85rem; color: var(--gris-texto); margin-top: 0.3rem; }
+
+.progreso-materia-card {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.4rem 1.6rem;
 }
-.progreso-tabla th { color: var(--gris-texto); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; }
+.progreso-materia-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+.progreso-materia-nombre { font-size: 1.15rem; font-weight: 800; color: var(--texto-oscuro); }
+.progreso-materia-meta { font-size: 0.85rem; color: var(--gris-texto); margin-top: 0.2rem; }
+.progreso-materia-badge {
+  background: rgba(52,168,83,0.12);
+  color: var(--verde);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 50px;
+  white-space: nowrap;
+}
+.progreso-materia-sin-temas {
+  font-size: 0.88rem;
+  color: var(--gris-texto);
+  background: var(--gris-claro);
+  padding: 0.8rem 1rem;
+  border-radius: var(--radio-sm);
+}
+
+.progreso-temas-lista {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #eee;
+}
+.progreso-tema-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #eee;
+}
+.progreso-tema-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--gris-texto);
+  background: var(--gris-claro);
+}
+.progreso-tema-check.ok { background: var(--verde); color: white; }
+.progreso-tema-nombre {
+  flex: 1;
+  font-size: 0.92rem;
+  color: var(--texto-oscuro);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.progreso-tema-estado {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gris-texto);
+}
+.progreso-tema-estado.ok { color: var(--verde); }

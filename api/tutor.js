@@ -22,6 +22,7 @@ export default async function handler(req, res) {
       curso,          // Primaria: "1".."6" · ESO: "1".."4" · Bachillerato: "1"/"2" (o "matematicas_I"/"matematicas_II")
       materia,        // clave tal como en los archivos de currículo, ej. "matematicas", "lengua_castellana"
       temaId,         // solo necesario en Primaria (organizada por temas discretos)
+      tema,           // texto del tema elegido en el mapa de temario (ESO/Bachillerato), para medir progreso por tema
       imagen,         // opcional: { data: base64SinPrefijo, mediaType: "image/jpeg" } — foto de la libreta
     } = req.body;
 
@@ -119,6 +120,7 @@ export default async function handler(req, res) {
       etapa,
       curso,
       materia,
+      tema: tema || null,
       mensaje_alumno: imagen ? `${mensaje || ""} [con foto adjunta]`.trim() : mensaje,
       respuesta_profe: textoRespuesta,
     });

@@ -1,8 +1,8 @@
 // src/pages/Progreso.jsx
 // Vista para que los padres/tutores vean la actividad de su hijo/a:
-// cuántas sesiones ha tenido, en qué materias, cuándo fue la última vez.
-// Usa la misma cuenta/login que el alumno (el email del tutor es el que
-// ya identifica la cuenta), así que no hace falta un sistema de login aparte.
+// cuántas sesiones ha tenido, en qué materias, y ahora también en qué
+// TEMAS concretos dentro de cada materia — con un vistazo tipo "practicado
+// / en progreso" en vez de solo un número total.
 
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
@@ -29,7 +29,7 @@ function ProgresoContenido() {
     <>
       <Seo title="Progreso" description="Progreso académico del alumno." path="/progreso" />
       <Navbar />
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "3rem 1.5rem" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "3rem 1.5rem 4rem" }}>
         <h1 style={{ fontSize: "2rem", fontWeight: 900, marginBottom: "0.4rem" }}>
           Progreso de {usuario.nombreAlumno}
         </h1>
@@ -37,49 +37,86 @@ function ProgresoContenido() {
           Un resumen de la actividad reciente en Tu Profe en Casa.
         </p>
 
-        {cargando && <p>Cargando...</p>}
+        {cargando && <p style={{ color: "var(--gris-texto)" }}>Cargando...</p>}
         {error && <p style={{ color: "var(--naranja)" }}>{error}</p>}
 
         {datos && (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+            <div className="progreso-stats-grid">
               <div className="progreso-stat-card">
                 <div className="progreso-stat-num">{datos.totalSesiones}</div>
-                <div>Preguntas totales</div>
+                <div className="progreso-stat-label">Preguntas totales</div>
               </div>
               <div className="progreso-stat-card">
                 <div className="progreso-stat-num">{datos.materiasDistintas}</div>
-                <div>Materias trabajadas</div>
+                <div className="progreso-stat-label">Materias trabajadas</div>
               </div>
               <div className="progreso-stat-card">
                 <div className="progreso-stat-num">{datos.ultimaActividad || "—"}</div>
-                <div>Última actividad</div>
+                <div className="progreso-stat-label">Última actividad</div>
               </div>
             </div>
 
-            <h2 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "0.6rem" }}>Actividad por materia</h2>
-            <table className="progreso-tabla">
-              <thead>
-                <tr>
-                  <th>Materia</th>
-                  <th>Preguntas</th>
-                  <th>Última vez</th>
-                </tr>
-              </thead>
-              <tbody>
-                {datos.porMateria.map((m) => (
-                  <tr key={m.materia}>
-                    <td>{m.materia}</td>
-                    <td>{m.conteo}</td>
-                    <td>{m.ultimaVez}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {datos.porMateria.length === 0 && (
+              <p style={{ color: "var(--gris-texto)", marginTop: "1rem" }}>
+                Todavía no hay actividad registrada. En cuanto {usuario.nombreAlumno} empiece a
+                usar la Profe, aquí aparecerá su progreso por materia y por tema.
+              </p>
+            )}
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem", marginTop: "1rem" }}>
+              {datos.porMateria.map((m) => (
+                <TarjetaMateria key={m.materia} materia={m} />
+              ))}
+            </div>
           </>
         )}
       </div>
     </>
+  );
+}
+
+function TarjetaMateria({ materia }) {
+  const practicados = materia.temas.filter((t) => t.estado === "practicado").length;
+  const totalTemas = materia.temas.length;
+
+  return (
+    <div className="progreso-materia-card">
+      <div className="progreso-materia-header">
+        <div>
+          <h2 className="progreso-materia-nombre">{materia.materia}</h2>
+          <p className="progreso-materia-meta">
+            {materia.conteo} {materia.conteo === 1 ? "pregunta" : "preguntas"} · última vez {materia.ultimaVez}
+          </p>
+        </div>
+        {totalTemas > 0 && (
+          <div className="progreso-materia-badge">
+            {practicados}/{totalTemas} temas practicados
+          </div>
+        )}
+      </div>
+
+      {totalTemas > 0 ? (
+        <div className="progreso-temas-lista">
+          {materia.temas.map((t) => (
+            <div key={t.tema} className="progreso-tema-fila">
+              <span className={`progreso-tema-check ${t.estado === "practicado" ? "ok" : ""}`}>
+                {t.estado === "practicado" ? "✓" : "●"}
+              </span>
+              <span className="progreso-tema-nombre" title={t.tema}>{t.tema}</span>
+              <span className={`progreso-tema-estado ${t.estado === "practicado" ? "ok" : ""}`}>
+                {t.estado === "practicado" ? "Practicado" : "En progreso"}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="progreso-materia-sin-temas">
+          Preguntas sueltas, sin pasar por el mapa de temario todavía. Anímale a entrar por
+          "Ver temario" para poder ver aquí el desglose por tema.
+        </p>
+      )}
+    </div>
   );
 }
 
