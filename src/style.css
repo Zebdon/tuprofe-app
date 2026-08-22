@@ -1491,6 +1491,9 @@ footer ul li a:hover {
 }
 .progreso-stat-num { font-size: 2rem; font-weight: 900; color: var(--azul-principal); line-height: 1.1; }
 .progreso-stat-label { font-size: 0.85rem; color: var(--gris-texto); margin-top: 0.3rem; }
+.progreso-stat-racha { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+.progreso-stat-racha .progreso-stat-num { color: #e65100; }
+.progreso-stat-racha .progreso-stat-label { color: #ad6200; font-weight: 700; }
 
 .progreso-materia-card {
   background: var(--blanco);

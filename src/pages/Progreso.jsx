@@ -43,6 +43,10 @@ function ProgresoContenido() {
         {datos && (
           <>
             <div className="progreso-stats-grid">
+              <div className="progreso-stat-card progreso-stat-racha">
+                <div className="progreso-stat-num">🔥 {datos.rachaDias}</div>
+                <div className="progreso-stat-label">{datos.rachaDias === 1 ? "día seguido" : "días seguidos"}</div>
+              </div>
               <div className="progreso-stat-card">
                 <div className="progreso-stat-num">{datos.totalSesiones}</div>
                 <div className="progreso-stat-label">Preguntas totales</div>

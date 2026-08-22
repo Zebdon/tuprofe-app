@@ -100,12 +100,42 @@ export default async function handler(req, res) {
       totalSesiones: conversaciones.length,
       materiasDistintas: Object.keys(porMateriaMapa).length,
       ultimaActividad: conversaciones[0] ? formatearFecha(conversaciones[0].created_at) : null,
+      rachaDias: calcularRacha(conversaciones.map((c) => c.created_at)),
       porMateria,
     });
   } catch (err) {
     console.error("Error en /api/progreso:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
+}
+
+// Cuenta días consecutivos con al menos una pregunta, empezando por hoy o
+// ayer (para no romper la racha solo porque todavía no ha estudiado hoy).
+// Si el alumno falló un día por medio, la racha se corta ahí.
+function calcularRacha(fechas) {
+  if (fechas.length === 0) return 0;
+
+  const diasConActividad = new Set(
+    fechas.map((f) => new Date(f).toISOString().slice(0, 10)) // "YYYY-MM-DD"
+  );
+
+  const hoy = new Date();
+  let cursor = new Date(hoy);
+  let racha = 0;
+
+  // Si hoy no hay actividad todavía, empezamos a contar desde ayer —
+  // así la racha no se resetea a 0 a media mañana antes de estudiar.
+  const claveHoy = cursor.toISOString().slice(0, 10);
+  if (!diasConActividad.has(claveHoy)) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  while (diasConActividad.has(cursor.toISOString().slice(0, 10))) {
+    racha += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return racha;
 }
 
 function formatearFecha(iso) {
