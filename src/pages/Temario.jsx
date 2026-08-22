@@ -39,6 +39,26 @@ const CURSOS_POR_ETAPA = {
   bachillerato: ["1", "2"],
 };
 
+const NOMBRE_ETAPA = {
+  primaria: "Primaria",
+  eso: "ESO",
+  bachillerato: "Bachillerato",
+};
+
+// Construye un enlace de búsqueda de YouTube ya filtrado por tema, materia
+// y curso — mismo patrón que el usado para "manualidades". No usa la API
+// de YouTube, así que no necesita clave ni cuota: solo abre resultados de
+// búsqueda normales en una pestaña nueva.
+function enlaceYoutube({ tema, materiaEtiqueta, curso, etapa }) {
+  const etiquetaCurso = etapa === "eso" ? `${curso}º ESO` : etapa === "bachillerato" ? `${curso}º Bachillerato` : `${curso}º Primaria`;
+  // Los "saberes" de ESO/Bachillerato pueden ser frases largas del currículo
+  // (no títulos cortos como en Primaria), así que recortamos a las primeras
+  // palabras clave para que la búsqueda en YouTube tenga sentido.
+  const nombreCorto = tema.nombre.split(" ").slice(0, 8).join(" ");
+  const query = `${nombreCorto} ${materiaEtiqueta} ${etiquetaCurso} explicación`;
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+}
+
 function TemarioContenido() {
   const { usuario } = useAuth();
   const navigate = useNavigate();
@@ -49,6 +69,8 @@ function TemarioContenido() {
   const [temas, setTemas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+
+  const materiaEtiqueta = MATERIAS_POR_ETAPA[etapa].find((m) => m.valor === materia)?.etiqueta || "";
 
   useEffect(() => {
     setCargando(true);
@@ -110,25 +132,58 @@ function TemarioContenido() {
             )}
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               {grupo.items.map((tema) => (
-                <button
+                <div
                   key={tema.id}
-                  onClick={() => abrirTema(tema)}
                   className="feature-card"
                   style={{
-                    textAlign: "left",
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.8rem",
-                    padding: "1rem 1.2rem",
-                    cursor: "pointer",
-                    border: "none",
-                    fontFamily: "inherit",
-                    fontSize: "0.95rem",
+                    gap: "0.6rem",
+                    padding: "0.4rem 0.6rem 0.4rem 1.2rem",
                   }}
                 >
-                  <span style={{ fontSize: "1.2rem" }}>📘</span>
-                  <span>{tema.nombre}</span>
-                </button>
+                  <button
+                    onClick={() => abrirTema(tema)}
+                    style={{
+                      flex: 1,
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.8rem",
+                      padding: "0.6rem 0",
+                      cursor: "pointer",
+                      border: "none",
+                      background: "none",
+                      fontFamily: "inherit",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    <span style={{ fontSize: "1.2rem" }}>📘</span>
+                    <span>{tema.nombre}</span>
+                  </button>
+                  <a
+                    href={enlaceYoutube({ tema, materiaEtiqueta, curso, etapa })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                      padding: "0.5rem 0.8rem",
+                      borderRadius: "50px",
+                      background: "var(--gris-claro)",
+                      color: "var(--gris-texto)",
+                      fontSize: "0.85rem",
+                      fontWeight: 700,
+                      whiteSpace: "nowrap",
+                      textDecoration: "none",
+                    }}
+                    title={`Buscar vídeos sobre ${tema.nombre} en YouTube`}
+                  >
+                    ▶ Vídeos
+                  </a>
+                </div>
               ))}
             </div>
           </div>
