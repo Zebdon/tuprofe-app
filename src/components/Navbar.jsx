@@ -7,6 +7,7 @@ const ENLACES = [
   { to: "/etapa/primaria", label: "🎒 Primaria" },
   { to: "/etapa/secundaria", label: "📐 Secundaria" },
   { to: "/etapa/bachillerato", label: "🎓 Bachillerato" },
+  { to: "/temario", label: "📖 Temario" },
 ];
 
 export default function Navbar() {

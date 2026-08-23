@@ -3,7 +3,7 @@
 // (clases de style.css), pero con estado real y llamadas a la API.
 
 import { useState } from "react";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, useSearchParams, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import Navbar from "../components/Navbar";
@@ -11,6 +11,11 @@ import Seo from "../components/Seo";
 
 export default function Auth() {
   const [tab, setTab] = useState("registro");
+  const [params] = useSearchParams();
+  // Si se llega desde el Temario público (sin cuenta) con un tema elegido,
+  // lo mostramos aquí como contexto y lo reenviamos al chat tras entrar.
+  const temaPendiente = params.get("tema");
+
   return (
     <>
       <Seo
@@ -38,6 +43,22 @@ export default function Auth() {
           {tab === "registro" ? "7 días sin coste. Sin compromiso." : "Accede a tu cuenta"}
         </p>
 
+        {temaPendiente && (
+          <div
+            style={{
+              background: "rgba(52,168,83,0.1)",
+              border: "1px solid rgba(52,168,83,0.3)",
+              borderRadius: "var(--radio-sm)",
+              padding: "0.7rem 0.9rem",
+              marginBottom: "1.2rem",
+              fontSize: "0.85rem",
+              color: "var(--texto-oscuro)",
+            }}
+          >
+            📘 Vas a continuar con: <strong>{temaPendiente}</strong>
+          </div>
+        )}
+
         <div className="form-tabs">
           <button className={`form-tab ${tab === "registro" ? "active" : ""}`} onClick={() => setTab("registro")}>
             Registrarse
@@ -55,6 +76,8 @@ export default function Auth() {
 }
 
 function FormularioRegistro() {
+  const [params] = useSearchParams();
+  const etapaPreseleccionada = params.get("etapa") || "";
   const [enviado, setEnviado] = useState(null); // null | { requiereConsentimiento }
   const [enviando, setEnviando] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -114,7 +137,7 @@ function FormularioRegistro() {
       </div>
       <div className="form-group">
         <label>Etapa educativa</label>
-        <select name="etapa" required defaultValue="">
+        <select name="etapa" required defaultValue={etapaPreseleccionada}>
           <option value="" disabled>Selecciona una etapa...</option>
           <option value="primaria">Educación Primaria (1.º a 6.º)</option>
           <option value="eso">ESO — Secundaria (1.º a 4.º)</option>
@@ -148,6 +171,7 @@ function FormularioRegistro() {
 function FormularioLogin() {
   const { iniciarSesion } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const [enviando, setEnviando] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -161,7 +185,16 @@ function FormularioLogin() {
       if (usuario.requiereConsentimientoParental && usuario.estadoConsentimiento !== "confirmado") {
         navigate("/consentimiento-pendiente");
       } else {
-        navigate("/app");
+        // Si venía del temario público con materia/curso/tema elegidos,
+        // los reenviamos al chat para no perder esa elección al entrar.
+        const materia = params.get("materia");
+        const curso = params.get("curso");
+        const tema = params.get("tema");
+        if (materia && curso && tema) {
+          navigate(`/app?${new URLSearchParams({ materia, curso, tema }).toString()}`);
+        } else {
+          navigate("/app");
+        }
       }
     } catch (err) {
       setErrorMsg(err.message);

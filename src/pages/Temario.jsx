@@ -2,12 +2,17 @@
 // Mapa de temario navegable, al estilo Khan Academy: el alumno elige
 // materia, ve la lista real de temas del currículo oficial, y al hacer
 // clic entra directo al chat centrado en ese tema exacto.
+//
+// PÚBLICO A PROPÓSITO: no requiere cuenta, para que se pueda explorar el
+// contenido real antes de registrarse (reduce fricción sin tocar el
+// consentimiento parental, que sigue siendo obligatorio para CHATEAR).
+// Si no hay sesión, al elegir un tema se manda a /auth con el tema
+// guardado en la URL, para no perder la elección al registrarse/entrar.
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
-import RutaProtegida from "../components/RutaProtegida";
 import Navbar from "../components/Navbar";
 import Seo from "../components/Seo";
 
@@ -39,30 +44,28 @@ const CURSOS_POR_ETAPA = {
   bachillerato: ["1", "2"],
 };
 
-const NOMBRE_ETAPA = {
-  primaria: "Primaria",
-  eso: "ESO",
-  bachillerato: "Bachillerato",
-};
+const ETAPAS = [
+  { valor: "primaria", etiqueta: "Primaria" },
+  { valor: "eso", etiqueta: "ESO" },
+  { valor: "bachillerato", etiqueta: "Bachillerato" },
+];
 
 // Construye un enlace de búsqueda de YouTube ya filtrado por tema, materia
-// y curso — mismo patrón que el usado para "manualidades". No usa la API
-// de YouTube, así que no necesita clave ni cuota: solo abre resultados de
-// búsqueda normales en una pestaña nueva.
+// y curso — no usa la API de YouTube, así que no necesita clave ni cuota.
 function enlaceYoutube({ tema, materiaEtiqueta, curso, etapa }) {
   const etiquetaCurso = etapa === "eso" ? `${curso}º ESO` : etapa === "bachillerato" ? `${curso}º Bachillerato` : `${curso}º Primaria`;
-  // Los "saberes" de ESO/Bachillerato pueden ser frases largas del currículo
-  // (no títulos cortos como en Primaria), así que recortamos a las primeras
-  // palabras clave para que la búsqueda en YouTube tenga sentido.
   const nombreCorto = tema.nombre.split(" ").slice(0, 8).join(" ");
   const query = `${nombreCorto} ${materiaEtiqueta} ${etiquetaCurso} explicación`;
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
 
-function TemarioContenido() {
+export default function Temario() {
   const { usuario } = useAuth();
   const navigate = useNavigate();
-  const etapa = usuario?.etapa || "eso";
+
+  // Con sesión: la etapa viene fija de la cuenta. Sin sesión: se elige a mano.
+  const [etapaManual, setEtapaManual] = useState("eso");
+  const etapa = usuario?.etapa || etapaManual;
 
   const [materia, setMateria] = useState(MATERIAS_POR_ETAPA[etapa][0].valor);
   const [curso, setCurso] = useState(CURSOS_POR_ETAPA[etapa][0]);
@@ -71,6 +74,14 @@ function TemarioContenido() {
   const [error, setError] = useState("");
 
   const materiaEtiqueta = MATERIAS_POR_ETAPA[etapa].find((m) => m.valor === materia)?.etiqueta || "";
+
+  // Si cambia la etapa (solo posible sin sesión), materia/curso de antes
+  // pueden no existir en la etapa nueva — se reinician a la primera opción.
+  useEffect(() => {
+    setMateria(MATERIAS_POR_ETAPA[etapa][0].valor);
+    setCurso(CURSOS_POR_ETAPA[etapa][0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [etapa]);
 
   useEffect(() => {
     setCargando(true);
@@ -83,25 +94,53 @@ function TemarioContenido() {
   }, [etapa, curso, materia]);
 
   function abrirTema(tema) {
-    const params = new URLSearchParams({ materia, curso, tema: tema.nombre });
-    navigate(`/app?${params.toString()}`);
+    const params = new URLSearchParams({ etapa, materia, curso, tema: tema.nombre });
+    if (usuario) {
+      navigate(`/app?${params.toString()}`);
+    } else {
+      // Sin cuenta: guardamos la elección en la URL de /auth para no
+      // perderla — al iniciar sesión, Auth.jsx la reenvía a /app.
+      navigate(`/auth?${params.toString()}`);
+    }
   }
 
-  // Agrupa por bloque (ESO/Bachillerato) para mostrar subtítulos tipo unidad.
-  // En Primaria no hay "bloque", así que se muestran todos bajo un único grupo.
   const grupos = agruparPorBloque(temas);
 
   return (
     <>
-      <Seo title="Temario" description="Mapa de temario del currículo oficial." path="/temario" />
+      <Seo title="Temario" description="Mapa de temario del currículo oficial LOMLOE de Asturias." path="/temario" />
       <Navbar />
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2.5rem 1.5rem 4rem" }}>
         <h1 style={{ fontSize: "1.9rem", fontWeight: 900, marginBottom: "0.4rem" }}>Temario</h1>
-        <p style={{ color: "var(--gris-texto)", marginBottom: "1.5rem" }}>
+        <p style={{ color: "var(--gris-texto)", marginBottom: usuario ? "1.5rem" : "0.8rem" }}>
           Elige un tema y la Profe te ayudará directamente con él.
         </p>
 
+        {!usuario && (
+          <div
+            style={{
+              background: "rgba(26,115,232,0.08)",
+              border: "1px solid rgba(26,115,232,0.25)",
+              borderRadius: "var(--radio-sm)",
+              padding: "0.8rem 1rem",
+              marginBottom: "1.5rem",
+              fontSize: "0.9rem",
+              color: "var(--azul-oscuro)",
+            }}
+          >
+            👀 Puedes explorar todo el temario libremente. Al elegir un tema para empezar a
+            preguntar, te pediremos crear una cuenta gratis.
+          </div>
+        )}
+
         <div style={{ display: "flex", gap: "0.6rem", marginBottom: "2rem", flexWrap: "wrap" }}>
+          {!usuario && (
+            <select value={etapa} onChange={(e) => setEtapaManual(e.target.value)} style={selectStyle}>
+              {ETAPAS.map((e) => (
+                <option key={e.valor} value={e.valor}>{e.etiqueta}</option>
+              ))}
+            </select>
+          )}
           <select value={curso} onChange={(e) => setCurso(e.target.value)} style={selectStyle}>
             {CURSOS_POR_ETAPA[etapa].map((c) => (
               <option key={c} value={c}>{c}.º</option>
@@ -213,11 +252,3 @@ const selectStyle = {
   fontFamily: "inherit",
   fontWeight: 600,
 };
-
-export default function Temario() {
-  return (
-    <RutaProtegida>
-      <TemarioContenido />
-    </RutaProtegida>
-  );
-}
