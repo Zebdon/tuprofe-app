@@ -8,7 +8,7 @@ export default function Seo({ title, description, path = "/" }) {
   const tituloCompleto = title
     ? `${title} | Tu Profe en Casa`
     : "Tu Profe en Casa — Tutor de IA con el currículo oficial de Asturias";
-  const url = `https://tuprofeencasa.com${path}`;
+  const url = `https://tuprofe-app.vercel.app${path}`;
 
   return (
     <Helmet>
@@ -19,7 +19,7 @@ export default function Seo({ title, description, path = "/" }) {
       <meta property="og:description" content={description} />
       <meta property="og:type" content="website" />
       <meta property="og:url" content={url} />
-      <meta property="og:image" content="https://tuprofeencasa.com/images/profe_alumno.jpg" />
+      <meta property="og:image" content="https://tuprofe-app.vercel.app/images/profe_alumno.jpg" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={tituloCompleto} />
       <meta name="twitter:description" content={description} />

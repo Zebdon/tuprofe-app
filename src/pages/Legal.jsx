@@ -23,8 +23,8 @@ export default function Legal() {
 
         <p style={{ marginTop: "2.5rem", fontSize: "0.85rem", color: "var(--gris-texto)" }}>
           Para el documento legal completo y actualizado, contacta con nosotros en{" "}
-          <a href="mailto:hola@tuprofeencasa.com" style={{ color: "var(--azul-principal)" }}>
-            hola@tuprofeencasa.com
+          <a href="mailto:cyntiazebaze@gmail.com" style={{ color: "var(--azul-principal)" }}>
+            cyntiazebaze@gmail.com
           </a>.
         </p>
       </div>

@@ -1,7 +1,7 @@
 # Política de Privacidad y Términos de Uso — Tu Profe en Casa
 
-**Última actualización:** [fecha de publicación]
-**Responsable del tratamiento:** [Tu nombre completo o razón social] — [NIF/CIF] — [dirección] — [email de contacto]
+**Última actualización:** 9 de septiembre de 2026
+**Responsable del tratamiento:** Cyntia Zebaze Dondjio — NIE Y1858602D — Gijón, Asturias, España — cyntiazebaze@gmail.com
 
 > ⚠️ **Aviso para Cyntia:** este documento es una base sólida y adaptada a tu app, pero antes de publicarla en Play Store te recomiendo que un abogado especializado en protección de datos la revise — especialmente la parte de consentimiento parental verificable, que es la que más escrutinio recibe. No sustituye asesoría legal profesional.
 
@@ -35,7 +35,7 @@ El padre, madre o tutor/a puede, en cualquier momento:
 - Solicitar su modificación o eliminación.
 - Revocar el consentimiento, lo que implica la baja de la cuenta.
 
-Para ejercer estos derechos: **[email de contacto para familias]**.
+Para ejercer estos derechos: **cyntiazebaze@gmail.com**.
 
 ---
 
@@ -58,7 +58,7 @@ Para ejercer estos derechos: **[email de contacto para familias]**.
 
 Las respuestas de la Profe IA se generan mediante la API de Anthropic (Claude), un proveedor externo de inteligencia artificial.
 
-- Los mensajes del alumno se envían a Anthropic únicamente para generar la respuesta pedagógica y **no se usan para entrenar sus modelos** de IA de forma general (según la política de uso comercial de la API de Anthropic vigente en la fecha de publicación — [verificar y enlazar la política vigente antes de publicar]).
+- Los mensajes del alumno se envían a Anthropic únicamente para generar la respuesta pedagógica y **no se usan para entrenar sus modelos** de IA de forma general, según la política de privacidad y uso de datos de la API comercial de Anthropic vigente en la fecha de publicación (consultable en privacy.anthropic.com).
 - Los mensajes se transmiten de forma cifrada.
 - Conservamos el historial de conversación el tiempo mínimo necesario para dar continuidad pedagógica, y se puede eliminar a petición del padre/madre/tutor o del alumno mayor de 14 años.
 - El asistente está configurado para **mantenerse dentro del ámbito educativo del currículo LOMLOE** y redirigir cualquier consulta ajena a ese propósito.
@@ -67,7 +67,7 @@ Las respuestas de la Profe IA se generan mediante la API de Anthropic (Claude), 
 
 ## 5. Seguridad de los datos
 
-Aplicamos medidas técnicas y organizativas razonables para proteger los datos: cifrado en tránsito, acceso restringido a la información, y minimización de datos recogidos. Los servidores utilizados son [Vercel / Supabase — completar con tus proveedores reales y su ubicación de datos, relevante para saber si hay transferencia internacional].
+Aplicamos medidas técnicas y organizativas razonables para proteger los datos: cifrado en tránsito, acceso restringido a la información, y minimización de datos recogidos. Los servidores utilizados son Vercel (alojamiento de la aplicación y funciones de backend) y Supabase (base de datos), y Anthropic (procesamiento de las consultas al asistente educativo). Estos proveedores pueden procesar datos fuera del Espacio Económico Europeo; en ese caso, actúan bajo las garantías correspondientes (como las Cláusulas Contractuales Tipo de la Comisión Europea) exigidas por su propia política de protección de datos.
 
 ---
 
@@ -81,7 +81,7 @@ El alumno (si es mayor de 14 años) o su padre/madre/tutor (si es menor de 14) p
 - **Limitación** y **oposición** al tratamiento.
 - **Portabilidad** de los datos.
 
-Para ejercerlos: **[email de contacto]**. Responderemos en un plazo máximo de un mes.
+Para ejercerlos: **cyntiazebaze@gmail.com**. Responderemos en un plazo máximo de un mes.
 
 También puede presentar una reclamación ante la **Agencia Española de Protección de Datos** (www.aepd.es) si considera que sus derechos no han sido respetados.
 
@@ -105,4 +105,4 @@ Podemos actualizar estos términos y la política de privacidad. Notificaremos c
 
 ## 8. Contacto
 
-Para cualquier duda sobre esta política o el ejercicio de derechos: **[email de contacto]**
+Para cualquier duda sobre esta política o el ejercicio de derechos: **cyntiazebaze@gmail.com**
