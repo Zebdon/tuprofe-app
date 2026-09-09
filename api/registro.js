@@ -118,7 +118,7 @@ async function enviarEmailConsentimiento({ emailTutor, nombreAlumno, token }) {
           </p>
           <p style="font-size:0.85rem; color:#666;">
             Si no reconoces esta solicitud, ignora este correo y la cuenta no se activará.
-            Puedes leer nuestra política de privacidad en tuprofe-app.vercel.app/legal/privacidad
+            Puedes leer nuestra política de privacidad en loentiendes.com/legal/privacidad
           </p>
         </div>
       `,

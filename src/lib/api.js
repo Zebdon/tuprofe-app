@@ -15,7 +15,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "";
 // En desarrollo web normal (npm run dev), BASE_URL vacío + rutas relativas
 // funciona igual que antes gracias al proxy de Vite. En build para Capacitor,
 // VITE_API_URL SIEMPRE debe estar definida apuntando a tu dominio de Vercel
-// (ej. "https://tuprofeencasa.com"), nunca dejarla vacía.
+// (ej. "https://loentiendes.com"), nunca dejarla vacía.
 
 async function peticion(ruta, opciones = {}) {
   const res = await fetch(`${BASE_URL}${ruta}`, {
