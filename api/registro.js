@@ -100,7 +100,7 @@ async function enviarEmailConsentimiento({ emailTutor, nombreAlumno, token }) {
       Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: "Tu Profe en Casa <onboarding@resend.dev>",
+      from: "Tu Profe en Casa <notificaciones@loentiendes.com>",
       to: emailTutor,
       subject: "Confirma el registro de tu hijo/a en Tu Profe en Casa",
       html: `

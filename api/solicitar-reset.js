@@ -60,7 +60,7 @@ async function enviarEmailReset({ email, nombreAlumno, token }) {
       Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: "Tu Profe en Casa <onboarding@resend.dev>",
+      from: "Tu Profe en Casa <notificaciones@loentiendes.com>",
       to: email,
       subject: "Restablece tu contraseña — Tu Profe en Casa",
       html: `
