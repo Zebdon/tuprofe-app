@@ -8,10 +8,12 @@
 
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
+import { aplicarCors } from "./_cors.js";
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export default async function handler(req, res) {
+  if (aplicarCors(req, res)) return;
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }

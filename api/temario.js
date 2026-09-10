@@ -3,8 +3,10 @@
 // de una materia/curso, para pintar el mapa de temario navegable.
 
 import { listarTemario } from "../data/curriculo-index.js";
+import { aplicarCors } from "./_cors.js";
 
 export default async function handler(req, res) {
+  if (aplicarCors(req, res)) return;
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
